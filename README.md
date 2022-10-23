@@ -1,3 +1,4 @@
-# CRUD-Node-JS---Medium
+1. npm install
+2. nodemon index.js
 
-https://medium.com/@sjlouji10/node-js-creating-a-crud-api-with-node-js-15baca7985be
+Zugeer demo app bolhoor env tavisangui shuud dotor n path uud n baigaa shuud ashiglaj bolno.
