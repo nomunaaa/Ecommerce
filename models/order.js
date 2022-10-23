@@ -2,8 +2,9 @@ const { ObjectId } = require("mongoose");
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-  created_at: {
-    type: Date,
+  created: {
+    type: String,
+    default: new Date().toISOString(),
   },
   productId: {
     type: ObjectId,
@@ -17,7 +18,7 @@ const OrderSchema = new mongoose.Schema({
   status: {
     type: Number,
   },
-  quantity: {
+  price: {
     type: Number,
   },
 });

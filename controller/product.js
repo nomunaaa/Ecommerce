@@ -1,49 +1,67 @@
-const Emp = require("../models/emp");
-const mongoose = require("mongoose");
+const User = require("../models/user");
+const Product = require("../models/product");
 
-function create(req, res, next) {
-  let empName = req.body.empName;
-  let empEmail = req.body.empEmail;
-  let empMobile = req.body.empMobile;
-  let emp = new Emp({
-    empName,
-    empEmail,
-    empMobile,
-  });
-  emp.save().then((data) => {
-    res.send(data);
-  });
-}
+const addProduct = async (req, res) => {
+  console.log(req.body, "ag");
+  const { name, image, description, price, email } = req.body;
 
-function view(req, res, next) {
-  Emp.find({}).then((data) => {
-    res.send(data);
+  try {
+    const user = await findUserByEmail(email);
+    console.log(user, "user");
+    const newProduct = await createProduct(
+      name,
+      image,
+      description,
+      price,
+      user._id
+    );
+    res.send({
+      code: 200,
+      message: "Successful",
+      preview: newProduct,
+    });
+    return newProduct;
+  } catch (err) {
+    res.send({
+      message: `${err.message}`,
+      code: 400,
+    });
+  }
+};
+const findUserByEmail = async (email) => {
+  const user = await User.findOne({
+    email: email,
   });
-}
+  if (!user) {
+    return false;
+  }
+  return user;
+};
 
-function update(req, res, next) {
-  Emp.findByIdAndUpdate(req.params.id, req.body, (err, emp) => {
-    if (err) {
-      return res
-        .status(500)
-        .send({ error: "Problem with Updating the Employee recored " });
-    }
-    res.send({ success: "Updation successfull" });
+const createProduct = async (name, image, description, price, salerId) => {
+  const newProduct = await Product.create({
+    name,
+    image,
+    description,
+    price,
+    salerId,
   });
-}
+  if (!newProduct) {
+    return [false, "Unable to create product"];
+  }
+};
+const listProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ salerId: { $exists: true } });
 
-function remove(req, res, next) {
-  Emp.findByIdAndDelete(req.params.id, (err, emp) => {
-    if (err) {
-      return res
-        .status(500)
-        .send({ error: "Problem with Deleting the Employee recored " });
-    }
-    res.send({ success: "Employee deleted successfully" });
-  });
-}
+    res.json(products);
+  } catch (err) {
+    res.send({
+      message: `${err.message}`,
+      code: 400,
+    });
+  }
+};
 
-module.exports.create = create;
-module.exports.view = view;
-module.exports.update = update;
-module.exports.remove = remove;
+module.exports.addProduct = addProduct;
+module.exports.listProducts = listProducts;

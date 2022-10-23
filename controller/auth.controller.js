@@ -8,6 +8,7 @@ let refreshTokens = [];
 const signUpUser = async (req, res) => {
   console.log(req.body, "ag");
   const { email, password, userStatus } = req.body;
+
   const isExisting = await findUserByEmail(email);
   if (isExisting) {
     return res.send("Already existing");
@@ -33,11 +34,11 @@ const Login = async (req, res) => {
     }
     // Validate if user exist in our database
     const user = await User.findOne({ email });
-
+    console.log(user);
     if (user && (await compare(password, user.password))) {
       // const accessToken = signToken(user);
 
-      let views;
+      var views = "";
       if (user.userStatus == 1) {
         views = "/buyerBoard";
       } else if (user.userStatus == 0) {
@@ -46,12 +47,12 @@ const Login = async (req, res) => {
       const refreshToken = signToken(user);
       refreshTokens.push(refreshToken);
       // res.json({ accessToken: accessToken });
-      const accessToken = generateAccessToken(
-        user._id,
-        user.email,
-        user.created,
-        views
-      );
+      const accessToken = generateAccessToken({
+        id: user._id,
+        email: user.email,
+        created: user.created,
+        views: views,
+      });
 
       res
         .status(200)
